@@ -1,0 +1,22 @@
+<div class="container-full">
+    <form  class="row g-3" [formGroup]="algoForm">
+        <div class="col-auto">
+            <select formControlName="selectedAlgo"  class="form-select form-select-lg mb-3" aria-label="Large select example">
+                @for (sortingAlgo of algoList; track $index) {
+                    <option value="{{sortingAlgo.code}}">{{sortingAlgo.name}}</option>
+                }
+              </select>
+        </div>
+        <div class="col-auto">
+            <input type="number" formControlName="arraySize" class="form-control" placeholder="Array Size" aria-label="Array Size">
+        </div>
+        <div class="col-auto">
+            <button (click)="sort()" class='btn btn-primary me-1' >Sort</button>
+        <button (click)="reInit()" class="btn btn-danger me-1" >Reinit</button>
+        <button (click)="stop()" class="btn btn-warning">Stop</button>
+        
+        </div>
+        </form>
+        <app-bar [data]="data"></app-bar>
+        
+</div>
