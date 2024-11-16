@@ -1,22 +1,29 @@
 <div class="container-full">
-    <form  class="row g-3" [formGroup]="algoForm">
+   
+    <form class="row align-items-center" [formGroup]="algoForm" (ngSubmit)="onSubmit($event)">
         <div class="col-auto">
-            <select formControlName="selectedAlgo"  class="form-select form-select-lg mb-3" aria-label="Large select example">
+            <label for="selectedAlgo" class="mb-1">Select Algorithm</label>
+            <select  formControlName="selectedAlgo" class="form-select mb-3" aria-label="Large select example">
                 @for (sortingAlgo of algoList; track $index) {
-                    <option value="{{sortingAlgo.code}}">{{sortingAlgo.name}}</option>
+                    <option [value]="sortingAlgo.code">{{sortingAlgo.name}}</option>
                 }
-              </select>
+            </select>
         </div>
-        <div class="col-auto">
+        <div class="col-auto mb-3">
+            <label for="arraySize" class="mb-1">Elements(max:1000)</label>
             <input type="number" formControlName="arraySize" class="form-control" placeholder="Array Size" aria-label="Array Size">
+          </div>
+        <div class="col-auto mb-3" >
+            <label for="delay" class="mb-1">Delay({{this.algoForm.controls['delay'].value}}ms)</label>
+            <input type="range" formControlName="delay" placeholder="Delay" class="form-range" min="0" max="1000" step="1" id="delay">
         </div>
-        <div class="col-auto">
-            <button (click)="sort()" class='btn btn-primary me-1' >Sort</button>
-        <button (click)="reInit()" class="btn btn-danger me-1" >Reinit</button>
-        <button (click)="stop()" class="btn btn-warning">Stop</button>
-        
+        <div class="col-auto mb-3">
+            <button (click)="sort()" type="button" [disabled]="isSorted || !algoForm.valid" class="btn btn-warning me-1"><i class="fa-solid fa-play"></i></button>
+            <button (click)="reInit()" type="button" class="btn btn-warning me-1"><i class="fa-solid fa-repeat"></i></button>
+            <button (click)="stop()" type="button" class="btn btn-warning"><i class="fa-solid fa-pause"></i></button>
         </div>
-        </form>
-        <app-bar [data]="data"></app-bar>
-        
+    </form>
+    <app-bar [mark]="marker" [data]="data"></app-bar>
+
 </div>
+        

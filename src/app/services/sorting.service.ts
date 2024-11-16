@@ -8,6 +8,8 @@ export class SortingService {
   $arrayData: BehaviorSubject<number[]> = new BehaviorSubject<number[]>([]);
   $delay: BehaviorSubject<number> = new BehaviorSubject<number>(0);
   $break: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+  $mark: BehaviorSubject<number> = new BehaviorSubject<number>(0);
+  $isSorted: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   constructor() {}
   public seedArray(size: number) {
     let array = [];
@@ -21,6 +23,7 @@ export class SortingService {
   };
 
   public async bubbleSort() {
+    this.$break.next(false);
     let array = this.$arrayData.getValue();
     for (let i = 0; i < array.length - 1; i++) {
       for (let j = 0; j < array.length - 1 - i; j++) {
@@ -29,17 +32,20 @@ export class SortingService {
           array[j] = array[j + 1];
           array[j + 1] = temp;
           await this.delay(this.$delay.getValue());
-          this.$arrayData.next(array);
-        }
-        if (this.$break.getValue()) {
-          this.$break.next(false);
-          return;
+          this.$mark.next(j + 1);
+          if (!this.propageArray(array)) {
+            return;
+          }
         }
       }
     }
+    this.$isSorted.next(true);
+    this.$mark.next(-1);
   }
 
   public async selectionSort() {
+    this.$break.next(false);
+
     let array = this.$arrayData.getValue();
     for (let i = 0; i < array.length - 1; i++) {
       let minIndex = i;
@@ -51,12 +57,24 @@ export class SortingService {
       let temp = array[i];
       array[i] = array[minIndex];
       array[minIndex] = temp;
+      this.$mark.next(minIndex);
       await this.delay(this.$delay.getValue());
-      this.$arrayData.next(array);
-      if (this.$break.getValue()) {
+      if (!this.propageArray(array)) {
         this.$break.next(false);
+
         return;
       }
+    }
+    this.$isSorted.next(true);
+    this.$mark.next(-1);
+  }
+
+  propageArray(array: number[]): boolean {
+    if (this.$break.getValue()) {
+      return false;
+    } else {
+      this.$arrayData.next(array);
+      return true;
     }
   }
 }
