@@ -33,12 +33,16 @@ export class BarComponent implements OnChanges {
   draw(data: number[]): void {
     const dataLength = data.length;
     const barWidth = window.innerWidth / dataLength;
+    const fontSize = Math.max(10, barWidth / 3.5);
+    const svgHeight = 600;
+    const maxValue = d3.max(data) || 0;
+    const maxBarHeight = 500;
 
     const svg = d3
       .select('.my-svg-container')
       .append('svg')
       .attr('width', window.innerWidth)
-      .attr('height', 550); // Increased height for labels
+      .attr('height', svgHeight);
 
     // Add bars
     svg
@@ -47,14 +51,15 @@ export class BarComponent implements OnChanges {
       .enter()
       .append('rect')
       .attr('x', (d, i) => i * barWidth)
-      .attr('y', (d) => 500 - d)
+      .attr('y', (d) => svgHeight - (d / maxValue) * maxBarHeight - 10) // Scale bar height proportionally
       .attr('width', barWidth)
-      .attr('height', (d) => d)
+      .attr('height', (d) => (d / maxValue) * maxBarHeight) // Scale bar height proportionally
       .attr('fill', 'blue')
       .attr('stroke', 'black')
       .attr('stroke-width', 2);
+    const showLabel = this.showLabel();
 
-    // Add value labels
+    // Add value labels on top of bars
     svg
       .selectAll('.bar-label')
       .data(data)
@@ -62,18 +67,23 @@ export class BarComponent implements OnChanges {
       .append('text')
       .attr('class', 'bar-label')
       .attr('x', (d, i) => i * barWidth + barWidth / 2)
-      .attr('y', 515)
-      .attr('text-anchor', 'start')
-      .attr('font-size', '12px')
-      .attr(
-        'transform',
-        (d, i) => `rotate(90, ${i * barWidth + barWidth / 2}, 515)`,
+      .attr('y', (d) => svgHeight - (d / maxValue) * maxBarHeight - 20) // Adjusted position above the bar
+      .attr('text-anchor', 'middle')
+      .attr('font-size', `${fontSize}px`)
+      .attr('transform', (d, i) =>
+        this.rotate(d, i, barWidth, svgHeight, maxValue, maxBarHeight),
       )
-      .text((d) => d);
+      .text((d) => (showLabel ? d : null));
   }
 
   updateData(newData: number[]): void {
     const barWidth = window.innerWidth / newData.length;
+    console.log('barWidth', barWidth);
+
+    const fontSize = Math.max(10, barWidth / 3);
+    const svgHeight = 600;
+    const maxValue = d3.max(newData) || 0;
+    const maxBarHeight = 500;
 
     const svg = d3.select('.my-svg-container').select('svg');
 
@@ -85,10 +95,10 @@ export class BarComponent implements OnChanges {
     // Update existing bars
     rects
       .attr('x', (d, i) => i * barWidth)
-      .attr('y', (d) => 500 - d)
+      .attr('y', (d) => svgHeight - (d / maxValue) * maxBarHeight - 10) // Scale bar height proportionally
       .attr('width', barWidth)
-      .attr('height', (d) => d)
-      .attr('fill', (d, i) => this.getBarColor(d, i))
+      .attr('height', (d) => (d / maxValue) * maxBarHeight) // Scale bar height proportionally
+      .attr('fill', (d, i) => this.getBarColor(i))
       .attr('stroke', 'black')
       .attr('stroke-width', 2);
 
@@ -97,52 +107,55 @@ export class BarComponent implements OnChanges {
       .enter()
       .append('rect')
       .attr('x', (d, i) => i * barWidth)
-      .attr('y', (d) => 500 - d)
+      .attr('y', (d) => svgHeight - (d / maxValue) * maxBarHeight - 10)
       .attr('width', barWidth)
-      .attr('height', (d) => d)
-      .attr('fill', (d, i) => this.getBarColor(d, i))
+      .attr('height', (d) => (d / maxValue) * maxBarHeight)
+      .attr('fill', (d, i) => this.getBarColor(i))
       .attr('stroke', 'black')
       .attr('stroke-width', 2);
 
-    // Update text labels
     const texts = svg.selectAll('.bar-label').data(newData);
 
-    // Remove old labels
     texts.exit().remove();
+    const showLabel = this.showLabel();
 
-    // Update existing labels
     texts
       .attr('x', (d, i) => i * barWidth + barWidth / 2)
-      .attr('y', 515)
-      .attr(
-        'transform',
-        (d, i) => `rotate(90, ${i * barWidth + barWidth / 2}, 515)`,
+      .attr('y', (d) => svgHeight - (d / maxValue) * maxBarHeight - 20) // Adjusted position above the bar
+      .attr('text-anchor', 'middle')
+      .attr('font-size', `${fontSize}px`)
+      .attr('transform', (d, i) =>
+        this.rotate(d, i, barWidth, svgHeight, maxValue, maxBarHeight),
       )
-      .text((d) => d);
+      .text((d) => (showLabel ? d : null));
 
-    // Add new labels
     texts
       .enter()
       .append('text')
       .attr('class', 'bar-label')
       .attr('x', (d, i) => i * barWidth + barWidth / 2)
-      .attr('y', 515)
-      .attr('text-anchor', 'start')
-      .attr('font-size', '12px')
-      .attr(
-        'transform',
-        (d, i) => `rotate(90, ${i * barWidth + barWidth / 2}, 515)`,
+      .attr('y', (d) => svgHeight - (d / maxValue) * maxBarHeight - 20) // Adjusted position above the bar
+      .attr('text-anchor', 'middle')
+      .attr('font-size', `${fontSize}px`)
+      .attr('transform', (d, i) =>
+        this.rotate(d, i, barWidth, svgHeight, maxValue, maxBarHeight),
       )
-      .text((d) => d);
-    //   this.index++;
-    // this.index = this.index % newData.length;
+      .text((d) => (showLabel ? d : null));
   }
-
-  getBarColor(value: number, index: number): string {
-    if (index === this.index) {
-      return 'red';
-    } else {
-      return 'blue';
-    }
+  getBarColor(index: number): string {
+    return index === this.index ? 'red' : 'blue';
+  }
+  showLabel(): boolean {
+    return this.data.length <= 100;
+  }
+  rotate(
+    d: number,
+    i: number,
+    barWidth: number,
+    svgHeight: number,
+    maxValue: number,
+    maxBarHeight: number,
+  ) {
+    return `rotate(-90, ${i * barWidth + barWidth / 2}, ${svgHeight - (d / maxValue) * maxBarHeight - 20})`;
   }
 }
