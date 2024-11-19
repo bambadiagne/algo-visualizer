@@ -4,6 +4,10 @@ This a a simple algo sorting visualizer using Angular to see elements switching.
 # Demo
     
 
+https://github.com/user-attachments/assets/d39cd010-8bf9-42a3-ac24-86ebcc54a750
+
+
+
 ## Algorithms
 
 - Bubble sort
