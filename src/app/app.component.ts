@@ -1,11 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
 import { SortingService } from './services/sorting.service';
 import { BarComponent } from './components/bar/bar.component';
 import { SortingAlgo, SORTING_ALGOS } from './models/sorting-algo';
 import {
   FormBuilder,
-  FormControl,
   FormGroup,
   FormsModule,
   ReactiveFormsModule,
@@ -37,8 +35,8 @@ export class AppComponent implements OnInit {
     this.sortingService.$delay.next(200);
     this.algoForm = this.fb.group({
       selectedAlgo: [this.algoList[0].code],
-      delay: [200, [Validators.min(0), Validators.max(200)]],
-      arraySize: [30, [Validators.min(0), Validators.max(100)]],
+      delay: [200, [Validators.min(0), Validators.max(1000)]],
+      arraySize: [30, [Validators.min(10), Validators.max(1000)]],
     });
     this.algoForm
       .get('selectedAlgo')
@@ -57,7 +55,9 @@ export class AppComponent implements OnInit {
       .get('arraySize')
       ?.valueChanges.pipe(takeUntil(this.$destroy))
       .subscribe((value: number) => {
-        this.reInit();
+        if (value >= 10 && value <= 1000) {
+          this.reInit();
+        }
       });
   }
   ngOnInit(): void {
@@ -79,7 +79,7 @@ export class AppComponent implements OnInit {
   }
   sort() {
     this.isSorted = true;
-    this.sortingService[this.selectedAlgo.code]();
+    this.sortingService[this.selectedAlgo.code](this.data);
   }
   reInit() {
     this.sortingService.$break.next(true);

@@ -1,5 +1,5 @@
 export interface SortingAlgo {
-  code: 'bubbleSort' | 'selectionSort';
+  code: 'bubbleSort' | 'selectionSort' | 'insertionSort' | 'mergeSort';
   name: string;
   description: string;
 }
@@ -15,5 +15,16 @@ export const SORTING_ALGOS: SortingAlgo[] = [
     name: 'Selection Sort',
     description:
       'Selection sort is a simple sorting algorithm. This sorting algorithm is an in-place comparison-based algorithm in which the list is divided into two parts, the sorted part at the left end and the unsorted part at the right end.',
+  },
+  {
+    code: 'insertionSort',
+    name: 'Insertion Sort',
+    description:
+      'Insertion sort is a simple sorting algorithm that builds the final sorted array one item at a time.',
+  },
+  {
+    code: 'mergeSort',
+    name: 'Merge Sort',
+    description: '',
   },
 ];

@@ -11,7 +11,7 @@
         </div>
         <div class="col-auto mb-3">
             <label for="arraySize" class="mb-1">Elements(max:1000)</label>
-            <input type="number" formControlName="arraySize" class="form-control" placeholder="Array Size" aria-label="Array Size">
+            <input type="number" formControlName="arraySize" class="form-control" min="10" max="1000" placeholder="Array Size" aria-label="Array Size">
           </div>
         <div class="col-auto mb-3" >
             <label for="delay" class="mb-1">Delay({{this.algoForm.controls['delay'].value}}ms)</label>
@@ -23,7 +23,7 @@
             <button (click)="stop()" type="button" class="btn btn-warning"><i class="fa-solid fa-pause"></i></button>
         </div>
     </form>
-    <app-bar [mark]="marker" [data]="data"></app-bar>
+    <app-bar [mark]="marker" [algoTitle]="selectedAlgo.name" [data]="data"></app-bar>
 
 </div>
         

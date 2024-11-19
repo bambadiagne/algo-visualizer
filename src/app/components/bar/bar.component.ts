@@ -32,6 +32,8 @@ export class BarComponent implements OnChanges {
 
   draw(data: number[]): void {
     const dataLength = data.length;
+    const barWidth = window.innerWidth / dataLength;
+
     const svg = d3
       .select('.my-svg-container')
       .append('svg')
@@ -44,9 +46,9 @@ export class BarComponent implements OnChanges {
       .data(data)
       .enter()
       .append('rect')
-      .attr('x', (d, i) => i * (window.innerWidth / dataLength))
+      .attr('x', (d, i) => i * barWidth)
       .attr('y', (d) => 500 - d)
-      .attr('width', window.innerWidth / dataLength)
+      .attr('width', barWidth)
       .attr('height', (d) => d)
       .attr('fill', 'blue')
       .attr('stroke', 'black')
@@ -59,24 +61,20 @@ export class BarComponent implements OnChanges {
       .enter()
       .append('text')
       .attr('class', 'bar-label')
-      .attr(
-        'x',
-        (d, i) =>
-          i * (window.innerWidth / dataLength) +
-          window.innerWidth / dataLength / 2,
-      )
+      .attr('x', (d, i) => i * barWidth + barWidth / 2)
       .attr('y', 515)
       .attr('text-anchor', 'start')
       .attr('font-size', '12px')
       .attr(
         'transform',
-        (d, i) =>
-          `rotate(90, ${i * (window.innerWidth / dataLength) + window.innerWidth / dataLength / 2}, 515)`,
+        (d, i) => `rotate(90, ${i * barWidth + barWidth / 2}, 515)`,
       )
       .text((d) => d);
   }
 
   updateData(newData: number[]): void {
+    const barWidth = window.innerWidth / newData.length;
+
     const svg = d3.select('.my-svg-container').select('svg');
 
     // Update bars
@@ -86,9 +84,9 @@ export class BarComponent implements OnChanges {
 
     // Update existing bars
     rects
-      .attr('x', (d, i) => i * (window.innerWidth / newData.length))
+      .attr('x', (d, i) => i * barWidth)
       .attr('y', (d) => 500 - d)
-      .attr('width', window.innerWidth / newData.length)
+      .attr('width', barWidth)
       .attr('height', (d) => d)
       .attr('fill', (d, i) => this.getBarColor(d, i))
       .attr('stroke', 'black')
@@ -98,9 +96,9 @@ export class BarComponent implements OnChanges {
     rects
       .enter()
       .append('rect')
-      .attr('x', (d, i) => i * (window.innerWidth / newData.length))
+      .attr('x', (d, i) => i * barWidth)
       .attr('y', (d) => 500 - d)
-      .attr('width', window.innerWidth / newData.length)
+      .attr('width', barWidth)
       .attr('height', (d) => d)
       .attr('fill', (d, i) => this.getBarColor(d, i))
       .attr('stroke', 'black')
@@ -114,17 +112,11 @@ export class BarComponent implements OnChanges {
 
     // Update existing labels
     texts
-      .attr(
-        'x',
-        (d, i) =>
-          i * (window.innerWidth / newData.length) +
-          window.innerWidth / newData.length / 2,
-      )
+      .attr('x', (d, i) => i * barWidth + barWidth / 2)
       .attr('y', 515)
       .attr(
         'transform',
-        (d, i) =>
-          `rotate(90, ${i * (window.innerWidth / newData.length) + window.innerWidth / newData.length / 2}, 515)`,
+        (d, i) => `rotate(90, ${i * barWidth + barWidth / 2}, 515)`,
       )
       .text((d) => d);
 
@@ -133,19 +125,13 @@ export class BarComponent implements OnChanges {
       .enter()
       .append('text')
       .attr('class', 'bar-label')
-      .attr(
-        'x',
-        (d, i) =>
-          i * (window.innerWidth / newData.length) +
-          window.innerWidth / newData.length / 2,
-      )
+      .attr('x', (d, i) => i * barWidth + barWidth / 2)
       .attr('y', 515)
       .attr('text-anchor', 'start')
       .attr('font-size', '12px')
       .attr(
         'transform',
-        (d, i) =>
-          `rotate(90, ${i * (window.innerWidth / newData.length) + window.innerWidth / newData.length / 2}, 515)`,
+        (d, i) => `rotate(90, ${i * barWidth + barWidth / 2}, 515)`,
       )
       .text((d) => d);
     //   this.index++;
