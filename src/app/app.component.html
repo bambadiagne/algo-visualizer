@@ -10,8 +10,8 @@
             </select>
         </div>
         <div class="col-auto mb-3">
-            <label for="arraySize" class="mb-1">Elements(max:1000)</label>
-            <input type="number" formControlName="arraySize" class="form-control" min="10" max="1000" placeholder="Array Size" aria-label="Array Size">
+            <label for="arraySize" class="mb-1">Elements({{this.algoForm.controls['arraySize'].value}})</label>
+            <input type="range" formControlName="arraySize" class="form-range" min="0" max="1000" placeholder="Array Size" aria-label="Array Size">
           </div>
         <div class="col-auto mb-3" >
             <label for="delay" class="mb-1">Delay({{this.algoForm.controls['delay'].value}}ms)</label>
@@ -24,6 +24,12 @@
         </div>
     </form>
     <app-bar [mark]="marker" [algoTitle]="selectedAlgo.name" [data]="data"></app-bar>
-
+    <div class="mb-2 text-center">
+       {{selectedAlgo.description}}
+       <div class="">
+        <code>{{selectedAlgo.complexity}}</code> 
+    </div>
+    </div>
+    
 </div>
         

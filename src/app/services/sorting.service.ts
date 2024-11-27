@@ -68,6 +68,7 @@ export class SortingService {
     this.$mark.next(-1);
   }
   public async selectionSort(array: number[]) {
+    console.time('selectionSort');
     this.$break.next(false);
 
     for (let i = 0; i < array.length - 1; i++) {
@@ -90,6 +91,7 @@ export class SortingService {
     }
     this.$isSorted.next(true);
     this.$mark.next(-1);
+    console.timeEnd('selectionSort');
   }
 
   propageArray(array: number[]): boolean {
@@ -100,7 +102,8 @@ export class SortingService {
       return true;
     }
   }
-  public async mergeSort(array: number[]) {
+
+  public async mergeSortWithList(array: number[]) {
     let left: number[] = [];
     let right: number[] = [];
     if (array.length === 1) {
@@ -108,16 +111,17 @@ export class SortingService {
     }
     const mid = Math.floor(array.length / 2);
 
-    left = (await this.mergeSort(array.slice(0, mid))) as number[];
-    right = (await this.mergeSort(array.slice(mid))) as number[];
+    left = (await this.mergeSortWithList(array.slice(0, mid))) as number[];
+    right = (await this.mergeSortWithList(array.slice(mid))) as number[];
 
-    let result = (await this.merge(left, right)) as number[];
+    let result = (await this.mergeWithList(left, right)) as number[];
     // this.$arrayData.next(result);
     this.$isSorted.next(true);
+
     this.$mark.next(-1);
     return result;
   }
-  public async merge(
+  public async mergeWithList(
     left: number[],
     right: number[],
   ): Promise<number[] | void> {
@@ -152,5 +156,52 @@ export class SortingService {
       return;
     }
     return result;
+  }
+  public async mergeSort(array: number[]) {
+    console.time('mergeSort');
+
+    this.$break.next(false);
+    await this.mergeSortWrapperTopDown(array, 0, array.length, array.slice());
+    this.$isSorted.next(true);
+    this.$mark.next(-1);
+    console.timeEnd('mergeSort');
+  }
+  public async mergeSortWrapperTopDown(
+    B: number[],
+    start: number,
+    end: number,
+    A: number[],
+  ) {
+    if (end - start <= 1) {
+      return;
+    }
+    const mid = Math.floor((start + end) / 2);
+    await this.mergeSortWrapperTopDown(A, start, mid, B);
+    await this.mergeSortWrapperTopDown(A, mid, end, B);
+    await this.merge(B, start, mid, end, A);
+  }
+  public async merge(
+    B: number[],
+    start: number,
+    mid: number,
+    end: number,
+    A: number[],
+  ) {
+    let i = start;
+    let j = mid;
+    for (let k = start; k < end; k++) {
+      if (i < mid && (j >= end || A[i] <= A[j])) {
+        B[k] = A[i];
+        i++;
+      } else {
+        B[k] = A[j];
+        j++;
+      }
+      if (!this.propageArray(B)) {
+        this.$break.next(false);
+        return;
+      }
+    }
+    await this.delay(this.$delay.getValue());
   }
 }

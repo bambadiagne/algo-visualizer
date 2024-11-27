@@ -78,7 +78,6 @@ export class BarComponent implements OnChanges {
 
   updateData(newData: number[]): void {
     const barWidth = window.innerWidth / newData.length;
-    console.log('barWidth', barWidth);
 
     const fontSize = Math.max(10, barWidth / 3);
     const svgHeight = 600;
