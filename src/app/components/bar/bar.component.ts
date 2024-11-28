@@ -11,17 +11,15 @@ import * as d3 from 'd3';
 export class BarComponent implements OnChanges {
   @Input() data: number[] = [];
   @Input() algoTitle: string = 'Bubble Sort';
-  lastValue: number = 0;
-  index: number = -1;
-  @Input() set mark(value: number) {
-    this.index = value;
+  indexes: number[] = [];
+  @Input() set mark(value: number[]) {
+    this.indexes = value;
   }
   constructor() {}
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['data'] && changes['data'].firstChange === false) {
       const newData = changes['data'].currentValue;
-      this.lastValue = newData[this.index];
       this.updateData(newData);
     }
   }
@@ -142,7 +140,7 @@ export class BarComponent implements OnChanges {
       .text((d) => (showLabel ? d : null));
   }
   getBarColor(index: number): string {
-    return index === this.index ? 'red' : 'blue';
+    return this.indexes.includes(index) ? 'red' : 'blue';
   }
   showLabel(): boolean {
     return this.data.length <= 100;

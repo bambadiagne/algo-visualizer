@@ -8,7 +8,7 @@ export class SortingService {
   $arrayData: BehaviorSubject<number[]> = new BehaviorSubject<number[]>([]);
   $delay: BehaviorSubject<number> = new BehaviorSubject<number>(0);
   $break: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
-  $mark: BehaviorSubject<number> = new BehaviorSubject<number>(0);
+  $mark: BehaviorSubject<number[]> = new BehaviorSubject<number[]>([]);
   $isSorted: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   constructor() {}
   public seedArray(size: number) {
@@ -31,7 +31,7 @@ export class SortingService {
           array[j] = array[j + 1];
           array[j + 1] = temp;
           await this.delay(this.$delay.getValue());
-          this.$mark.next(j + 1);
+          this.$mark.next([j + 1]);
           if (!this.propageArray(array)) {
             return;
           }
@@ -39,7 +39,7 @@ export class SortingService {
       }
     }
     this.$isSorted.next(true);
-    this.$mark.next(-1);
+    this.$mark.next([]);
   }
   public async insertionSort(array: number[]) {
     this.$break.next(false);
@@ -48,7 +48,7 @@ export class SortingService {
       let j = i;
       while (j > 0 && array[j - 1] > element) {
         array[j] = array[j - 1];
-        this.$mark.next(j);
+        this.$mark.next([j]);
         await this.delay(this.$delay.getValue());
         if (!this.propageArray(array)) {
           this.$break.next(false);
@@ -57,7 +57,7 @@ export class SortingService {
         j--;
       }
       array[j] = element;
-      this.$mark.next(j);
+      this.$mark.next([j]);
       await this.delay(this.$delay.getValue());
       if (!this.propageArray(array)) {
         this.$break.next(false);
@@ -65,7 +65,7 @@ export class SortingService {
       }
     }
     this.$isSorted.next(true);
-    this.$mark.next(-1);
+    this.$mark.next([]);
   }
   public async selectionSort(array: number[]) {
     console.time('selectionSort');
@@ -81,7 +81,7 @@ export class SortingService {
       let temp = array[i];
       array[i] = array[minIndex];
       array[minIndex] = temp;
-      this.$mark.next(minIndex);
+      this.$mark.next([minIndex]);
       await this.delay(this.$delay.getValue());
       if (!this.propageArray(array)) {
         this.$break.next(false);
@@ -90,7 +90,7 @@ export class SortingService {
       }
     }
     this.$isSorted.next(true);
-    this.$mark.next(-1);
+    this.$mark.next([]);
     console.timeEnd('selectionSort');
   }
 
@@ -118,7 +118,7 @@ export class SortingService {
     // this.$arrayData.next(result);
     this.$isSorted.next(true);
 
-    this.$mark.next(-1);
+    this.$mark.next([]);
     return result;
   }
   public async mergeWithList(
@@ -158,12 +158,10 @@ export class SortingService {
     return result;
   }
   public async mergeSort(array: number[]) {
-    console.time('mergeSort');
-
     this.$break.next(false);
+
+    console.time('mergeSort');
     await this.mergeSortWrapperTopDown(array, 0, array.length, array.slice());
-    this.$isSorted.next(true);
-    this.$mark.next(-1);
     console.timeEnd('mergeSort');
   }
   public async mergeSortWrapperTopDown(
@@ -175,11 +173,16 @@ export class SortingService {
     if (end - start <= 1) {
       return;
     }
+
     const mid = Math.floor((start + end) / 2);
     await this.mergeSortWrapperTopDown(A, start, mid, B);
     await this.mergeSortWrapperTopDown(A, mid, end, B);
+
     await this.merge(B, start, mid, end, A);
+    this.$isSorted.next(true);
+    this.$mark.next([]);
   }
+
   public async merge(
     B: number[],
     start: number,
@@ -189,7 +192,11 @@ export class SortingService {
   ) {
     let i = start;
     let j = mid;
+    this.markerRange(start, end);
+
     for (let k = start; k < end; k++) {
+      // this.markerRange(i,j);
+
       if (i < mid && (j >= end || A[i] <= A[j])) {
         B[k] = A[i];
         i++;
@@ -197,11 +204,18 @@ export class SortingService {
         B[k] = A[j];
         j++;
       }
+      await this.delay(this.$delay.getValue());
       if (!this.propageArray(B)) {
         this.$break.next(false);
         return;
       }
     }
-    await this.delay(this.$delay.getValue());
+  }
+  markerRange(start: number, end: number) {
+    let mark = [];
+    for (let i = start; i < end; i++) {
+      mark.push(i);
+    }
+    this.$mark.next(mark);
   }
 }

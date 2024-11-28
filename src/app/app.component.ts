@@ -24,7 +24,7 @@ export class AppComponent implements OnInit {
   algoList = SORTING_ALGOS;
   algoForm: FormGroup;
   selectedAlgo: SortingAlgo = this.algoList[0];
-  marker = 0;
+  marker: number[] = [];
   isSorted = false;
   constructor(
     private sortingService: SortingService,
@@ -85,12 +85,12 @@ export class AppComponent implements OnInit {
     this.sortingService.$break.next(true);
     this.sortingService.seedArray(this.algoForm.get('arraySize')?.value);
     this.isSorted = false;
-    this.marker = -1;
+    this.marker = [];
   }
 
   stop() {
     this.sortingService.$break.next(true);
-    this.marker = -1;
+    this.marker = [];
     this.isSorted = false;
   }
   onSubmit(e: Event) {
